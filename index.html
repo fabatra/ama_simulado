@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado de Matemática - 3ª Série Ensino Médio</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-hover: #1e40af;
+            --secondary: #0d9488;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --muted: #64748b;
+            --correct: #15803d;
+            --correct-bg: #f0fdf4;
+            --wrong: #b91c1c;
+            --wrong-bg: #fef2f2;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Form Cadastro */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 12px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        input[type="text"]:focus, select:focus {
+            border-color: var(--primary);
+        }
+
+        .btn {
+            display: inline-block;
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Questão */
+        .progress-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--secondary);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .q-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .q-badge {
+            background: #e0f2fe;
+            color: #0369a1;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .q-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        /* Dica de Fórmula Box */
+        .formula-box {
+            background: #f0f9ff;
+            border-left: 4px solid #0284c7;
+            padding: 12px 15px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            color: #0369a1;
+            line-height: 1.5;
+        }
+
+        .formula-box strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .options-list {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .option-item {
+            margin-bottom: 10px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-label:hover {
+            background-color: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .option-label input {
+            margin-right: 12px;
+            transform: scale(1.2);
+        }
+
+        /* Feedback Correção Vertical */
+        .feedback-box {
+            display: none;
+            padding: 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .feedback-box.correct {
+            display: block;
+            background: var(--correct-bg);
+            border: 1.5px solid var(--correct);
+            color: #14532d;
+        }
+
+        .feedback-box.wrong {
+            display: block;
+            background: var(--wrong-bg);
+            border: 1.5px solid var(--wrong);
+            color: #7f1d1d;
+        }
+
+        .feedback-box strong.title {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .resolution-vertical {
+            background: rgba(255, 255, 255, 0.6);
+            padding: 12px 15px;
+            border-radius: 6px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            margin-top: 8px;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 600;
+        }
+
+        /* Resultado Final */
+        .score-card {
+            text-align: center;
+            padding: 20px;
+            background: #f1f5f9;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .score-num {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+
+        .summary-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-ok { color: var(--correct); font-weight: bold; }
+        .status-err { color: var(--wrong); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Simulado de Matemática - AMA 2026</h1>
+        <p>3ª Série do Ensino Médio | Treino Diagnóstico</p>
+    </header>
+
+    <!-- TELA 1: CADASTRO DO ALUNO -->
+    <div id="screen-setup" class="screen active">
+        <div class="form-group">
+            <label for="student-name">Nome Completo do Aluno:</label>
+            <input type="text" id="student-name" placeholder="Digite seu nome completo..." autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label for="student-class">Selecione sua Turma:</label>
+            <select id="student-class">
+                <option value="">-- Selecione a Turma --</option>
+                <option value="3M1">3M1</option>
+                <option value="3M2">3M2</option>
+                <option value="3M3">3M3</option>
+            </select>
+        </div>
+        <button class="btn" onclick="startQuiz()">Iniciar Simulado</button>
+    </div>
+
+    <!-- TELA 2: QUESTAO A QUESTAO -->
+    <div id="screen-quiz" class="screen">
+        <div class="progress-bar">
+            <div id="progress-fill" class="progress-fill"></div>
+        </div>
+
+        <div class="q-header">
+            <span id="q-counter" class="q-badge">Questão 1 de 26</span>
+            <span id="student-info" style="font-size:0.85rem; color:var(--muted)"></span>
+        </div>
+
+        <div id="q-title" class="q-title"></div>
+
+        <div id="formula-box" class="formula-box">
+            <strong>💡 Dica & Fórmula:</strong>
+            <div id="formula-text"></div>
+        </div>
+
+        <ul id="options-list" class="options-list"></ul>
+
+        <div id="feedback-box" class="feedback-box">
+            <strong id="feedback-title" class="title"></strong>
+            <div id="feedback-text"></div>
+        </div>
+
+        <button id="btn-action" class="btn" onclick="handleAction()">Confirmar Resposta</button>
+    </div>
+
+    <!-- TELA 3: RESULTADO FINAL -->
+    <div id="screen-result" class="screen">
+        <div class="score-card">
+            <h2>Simulado Concluído!</h2>
+            <p id="result-student" style="margin-top:5px; font-weight:600; color:var(--muted)"></p>
+            <div id="score-num" class="score-num">0 / 26</div>
+            <p id="score-percent" style="font-weight:600; font-size:1.1rem; color:var(--secondary)"></p>
+        </div>
+
+        <h3>Resumo do Desempenho</h3>
+        <div id="summary-list" class="summary-list"></div>
+
+        <button class="btn" onclick="restartQuiz()">Fazer Novamente</button>
+    </div>
+</div>
+
+<script>
+const questions = [
+    {
+        title: "01. Uma reta no plano cartesiano passa pelos pontos (0, -3) e (2, 1). Qual é a sua equação reduzida?",
+        formula: "Forma reduzida: y = mx + b<br>m = (y₂ - y₁) / (x₂ - x₁)<br>b = ponto onde a reta cruza o eixo y.",
+        options: ["A) y = 2x - 3", "B) y = x - 3", "C) y = -2x + 3", "D) y = 3x - 2", "E) y = (1/2)x - 3"],
+        answer: 0,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Linear): Ponto (0, -3) ⇒ b = -3<br>• Passo 2 (Angular): m = (1 - (-3)) / (2 - 0)<br>  m = 4 / 2 = 2<br>• Passo 3 (Equação): y = 2x - 3"
+    },
+    {
+        title: "02. A planificação de uma pirâmide reta de base quadrada é formada por quais superfícies?",
+        formula: "Pirâmides possuem:<br>• 1 base poligonal<br>• n faces laterais triangulares.",
+        options: ["A) 1 quadrado e 3 triângulos", "B) 2 quadrados e 4 triângulos", "C) 1 retângulo e 4 retângulos", "D) 1 quadrado e 4 triângulos congruentes", "E) 2 círculos e 1 retângulo"],
+        answer: 3,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Base): 1 quadrado<br>• Passo 2 (Faces Laterais): 4 triângulos isósceles congruentes<br>• Resultado: 1 quadrado e 4 triângulos congruentes"
+    },
+    {
+        title: "03. Uma reta g(x) = ax + b é decrescente e intercepta o eixo vertical y abaixo da origem. Quais são os sinais de a e b?",
+        formula: "Análise dos sinais:<br>• Reta decrescente ⇒ a < 0<br>• Interseção em y abaixo da origem ⇒ b < 0",
+        options: ["A) a > 0 e b > 0", "B) a < 0 e b < 0", "C) a < 0 e b > 0", "D) a > 0 e b < 0", "E) a = 0 e b < 0"],
+        answer: 1,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Sinal de a): Função decrescente ⇒ a < 0<br>• Passo 2 (Sinal de b): Interseção no eixo y negativa ⇒ b < 0<br>• Resultado: a < 0 e b < 0"
+    },
+    {
+        title: "04. O ponto P possui abscissa x = -5 e ordenada y = 3. Em qual quadrante o ponto P está localizado?",
+        formula: "Sinais dos Quadrantes:<br>• 1º Q: (+, +)<br>• 2º Q: (-, +)<br>• 3º Q: (-, -)<br>• 4º Q: (+, -)",
+        options: ["A) 1º Quadrante", "B) 3º Quadrante", "C) 4º Quadrante", "D) 2º Quadrante", "E) Sobre o eixo x"],
+        answer: 3,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Eixo x): x = -5 (negativo, à esquerda)<br>• Passo 2 (Eixo y): y = 3 (positivo, acima)<br>• Resultado: Ponto situado no 2º Quadrante"
+    },
+    {
+        title: "05. Uma cultura de bactérias inicia com 3 indivíduos e triplica a cada dia (q = 3). Quantas bactérias haverá no 6º dia?",
+        formula: "Termo geral da PG:<br>a_n = a₁ · q^(n-1)<br>Para n = 6: a₆ = 3 · 3^(6-1)",
+        options: ["A) 243", "B) 486", "C) 729", "D) 2 187", "E) 81"],
+        answer: 2,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Fórmula): a₆ = 3 · 3⁵<br>• Passo 2 (Potência): 3⁵ = 243<br>• Passo 3 (Cálculo): a₆ = 3 · 243<br>  a₆ = 729 bactérias"
+    },
+    {
+        title: "06. O gráfico de f(x) = b^x passa pelo ponto (1, 4). Qual é a lei dessa função?",
+        formula: "Substituição de ponto:<br>f(x) = b^x<br>f(1) = b¹ = 4",
+        options: ["A) f(x) = 2^x", "B) f(x) = 4^x", "C) f(x) = (1/4)^x", "D) f(x) = 4x", "E) f(x) = x^4"],
+        answer: 1,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Substituição): f(1) = b¹ = 4<br>• Passo 2 (Base): b = 4<br>• Passo 3 (Lei): f(x) = 4^x"
+    },
+    {
+        title: "07. A planificação da superfície de um cone circular reto é composta por quais figuras?",
+        formula: "Corpo redondo (Cone):<br>• 1 base circular<br>• 1 superfície lateral curva",
+        options: ["A) 2 círculos e 1 retângulo", "B) 1 triângulo e 1 círculo", "C) 1 quadrado e 1 setor circular", "D) 2 triângulos e 1 retângulo", "E) 1 círculo e 1 setor circular"],
+        answer: 4,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Base): 1 círculo<br>• Passo 2 (Superfície Lateral): 1 setor circular<br>• Resultado: 1 círculo e 1 setor circular"
+    },
+    {
+        title: "08. Uma reta paralela ao eixo das abscissas (eixo x) cruza o eixo y no ponto (0, 5). Qual é sua equação?",
+        formula: "Retas horizontais:<br>• Inclinação a = 0<br>• Equação constante: y = b",
+        options: ["A) x = 5", "B) y = 5x", "C) y = x + 5", "D) y = -5x", "E) y = 5"],
+        answer: 4,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Inclinação): Reta horizontal ⇒ a = 0<br>• Passo 2 (Interseção y): Ponto (0, 5) ⇒ b = 5<br>• Resultado: y = 5"
+    },
+    {
+        title: "09. Um poliedro convexo tem número de vértices igual ao triplo das faces (V = 3F). Qual a relação entre arestas A e faces F?",
+        formula: "Relação de Euler:<br>V - A + F = 2<br>Substitua V por 3F.",
+        options: ["A) A = 4F - 2", "B) A = 2F + 2", "C) A = 3F - 2", "D) A = 4F + 2", "E) A = 3F + 2"],
+        answer: 0,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Euler): V - A + F = 2<br>• Passo 2 (Substituir V): 3F - A + F = 2<br>• Passo 3 (Simplificação): 4F - A = 2<br>• Passo 4 (Isolar A): A = 4F - 2"
+    },
+    {
+        title: "10. Uma folha de 0,1 mm de espessura é dobrada ao meio sucessivamente. Qual a espessura após 10 dobras?",
+        formula: "Crescimento Exponencial:<br>Espessura = e₀ · 2ⁿ<br>Para n = 10: 0,1 · 2¹⁰",
+        options: ["A) 10,24 mm", "B) 102,4 mm", "C) 51,2 mm", "D) 204,8 mm", "E) 1 024 mm"],
+        answer: 1,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Fórmula): Espessura = 0,1 · 2¹⁰<br>• Passo 2 (Potência): 2¹⁰ = 1 024<br>• Passo 3 (Cálculo): 0,1 · 1 024<br>  Espessura = 102,4 mm"
+    },
+    {
+        title: "11. A reta que passa pelo ponto (2, -1) com coeficiente angular m = -3 tem qual equação reduzida?",
+        formula: "Equação Fundamental:<br>y - y₀ = m(x - x₀)<br>Substitua (x₀, y₀) = (2, -1) e m = -3",
+        options: ["A) y = -3x + 2", "B) y = 3x - 7", "C) y = -3x + 1", "D) y = -3x + 5", "E) y = -3x - 5"],
+        answer: 3,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Fórmula): y - (-1) = -3(x - 2)<br>• Passo 2 (Sinais): y + 1 = -3x + 6<br>• Passo 3 (Isolar y): y = -3x + 6 - 1<br>  y = -3x + 5"
+    },
+    {
+        title: "12. Um poliedro convexo tem 10 faces e 18 arestas. Quantos vértices possui esse poliedro?",
+        formula: "Relação de Euler:<br>V - A + F = 2<br>Dados: F = 10, A = 18",
+        options: ["A) 8", "B) 10", "C) 12", "D) 14", "E) 16"],
+        answer: 1,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Euler): V - 18 + 10 = 2<br>• Passo 2 (Simplificar): V - 8 = 2<br>• Passo 3 (Isolar V): V = 2 + 8<br>  V = 10 vértices"
+    },
+    {
+        title: "13. Um reservatório cilíndrico tem raio r = 3 m e altura h = 5 m. Com π ≈ 3 e custo de R\$ 50,00 por m³, qual o custo total?",
+        formula: "Volume do Cilindro:<br>V = π · r² · h<br>Custo = Volume · R\$ 50,00",
+        options: ["A) R\$ 4.500,00", "B) R\$ 6.750,00", "C) R\$ 13.500,00", "D) R\$ 2.250,00", "E) R\$ 9.000,00"],
+        answer: 1,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Volume): V = 3 · 3² · 5<br>  V = 3 · 9 · 5<br>  V = 135 m³<br>• Passo 2 (Custo): 135 · R\$ 50,00<br>  Custo = R\$ 6.750,00"
+    },
+    {
+        title: "14. O valor V(t) de um equipamento após t anos é V(t) = 8000 · (0,8)^t. Qual o valor após t = 2 anos?",
+        formula: "Decaimento Exponencial:<br>V(2) = 8000 · (0,8)²",
+        options: ["A) R\$ 6.400,00", "B) R\$ 4.800,00", "C) R\$ 5.120,00", "D) R\$ 3.200,00", "E) R\$ 5.760,00"],
+        answer: 2,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Potência): (0,8)² = 0,64<br>• Passo 2 (Multiplicação): V(2) = 8000 · 0,64<br>  V(2) = R\$ 5.120,00"
+    },
+    {
+        title: "15. No plano cartesiano, qual ponto possui coordenadas (3, -2)?",
+        formula: "Localização de Ponto:<br>x = 3 (3 unidades à direita)<br>y = -2 (2 unidades para baixo)",
+        options: ["A) Ponto K", "B) Ponto L", "C) Ponto M", "D) Ponto N", "E) Ponto O"],
+        answer: 0,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Eixo x): x = 3 (direita)<br>• Passo 2 (Eixo y): y = -2 (abaixo)<br>• Passo 3 (Identificação): Ponto K (4º Quadrante)"
+    },
+    {
+        title: "16. A fração 18/4 representada em formato de número decimal é igual a:",
+        formula: "Conversão Fração → Decimal:<br>Divida o numerador pelo denominador (18 ÷ 4).",
+        options: ["A) 4,2", "B) 4,25", "C) 4,5", "D) 4,8", "E) 5,0"],
+        answer: 2,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Divisão): 18 ÷ 4<br>  18 / 4 = 4,5"
+    },
+    {
+        title: "17. Num mapa com escala 1 : 50 000, a distância entre duas cidades é 8 cm. Qual a distância real em km?",
+        formula: "Cálculo de Escala:<br>Distância real = d · Escala<br>100 000 cm = 1 km",
+        options: ["A) 0,4 km", "B) 4 km", "C) 40 km", "D) 400 km", "E) 4 000 km"],
+        answer: 1,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Medida em cm): 8 · 50 000 = 400 000 cm<br>• Passo 2 (Para metros): 400 000 ÷ 100 = 4 000 m<br>• Passo 3 (Para km): 4 000 ÷ 1 000 = 4 km"
+    },
+    {
+        title: "18. Num triângulo retângulo, a altura h divide a hipotenusa em projeções m = 25 m e n = 4 m. Qual a medida de h?",
+        formula: "Relações Métricas:<br>h² = m · n<br>h = √(m · n)",
+        options: ["A) 10 m", "B) 20 m", "C) 29 m", "D) 100 m", "E) 12,5 m"],
+        answer: 0,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Fórmula): h² = 25 · 4<br>• Passo 2 (Cálculo): h² = 100<br>• Passo 3 (Raiz): h = √100<br>  h = 10 m"
+    },
+    {
+        title: "19. A área de um terreno quadrado é de 625 m². Qual é a medida do lado x desse terreno?",
+        formula: "Área do Quadrado:<br>Área = x²<br>x = √Área",
+        options: ["A) 15 m", "B) 25 m", "C) 35 m", "D) 45 m", "E) 50 m"],
+        answer: 1,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Fórmula): x² = 625<br>• Passo 2 (Raiz): x = √625<br>  x = 25 m"
+    },
+    {
+        title: "20. Pontuação dos alunos (Etapa 1 + Etapa 2): Bruno (30+45), Juliana (40+42), Lucas (50+25), Mariana (35+40). Quem venceu?",
+        formula: "Soma das Notas:<br>Nota Final = Etapa 1 + Etapa 2",
+        options: ["A) Bruno", "B) Juliana", "C) Lucas", "D) Mariana", "E) Empate"],
+        answer: 1,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Bruno): 30 + 45 = 75<br>• Passo 2 (Juliana): 40 + 42 = 82<br>• Passo 3 (Lucas): 50 + 25 = 75<br>• Passo 4 (Mariana): 35 + 40 = 75<br>• Resultado: Juliana venceu com 82 pontos"
+    },
+    {
+        title: "21. Uma mensagem é enviada a 5 pessoas. A cada minuto a quantidade quadruplica (q = 4). Quantos recebem no 4º minuto?",
+        formula: "Termo geral da PG:<br>a_n = a₁ · q^(n-1)<br>Para n = 4: a₄ = 5 · 4³",
+        options: ["A) 80", "B) 160", "C) 320", "D) 640", "E) 1 280"],
+        answer: 2,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Fórmula): a₄ = 5 · 4³<br>• Passo 2 (Potência): 4³ = 64<br>• Passo 3 (Cálculo): a₄ = 5 · 64<br>  a₄ = 320 pessoas"
+    },
+    {
+        title: "22. A planificação de uma pirâmide regular de base hexagonal é formada por quais superfícies?",
+        formula: "Pirâmide Hexagonal:<br>• 1 base hexagonal<br>• 6 faces laterais triangulares",
+        options: ["A) 2 hexágonos e 6 retângulos", "B) 1 hexágono e 5 triângulos", "C) 1 hexágono e 6 triângulos congruentes", "D) 6 quadrados e 1 hexágono", "E) 1 círculo e 6 triângulos"],
+        answer: 2,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Base): 1 hexágono regular<br>• Passo 2 (Faces Laterais): 6 triângulos congruentes<br>• Resultado: 1 hexágono e 6 triângulos"
+    },
+    {
+        title: "23. O gráfico de f(x) = 2^x + 1 intercepta o eixo y em qual ponto e tem qual assíntota?",
+        formula: "Análise da Função:<br>• Interseção y: f(0) = 2⁰ + 1<br>• Assíntota: Limite quando x → -∞",
+        options: ["A) Ponto (0,1) e assíntota y=0", "B) Ponto (0,2) e assíntota y=0", "C) Ponto (0,2) e assíntota y=1", "D) Ponto (0,3) e assíntota y=2", "E) Ponto (1,2) e assíntota y=1"],
+        answer: 2,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Corte em y): f(0) = 2⁰ + 1 = 1 + 1 = 2 ⇒ Ponto (0, 2)<br>• Passo 2 (Assíntota): Como 2ˣ > 0, y > 1 ⇒ Assíntota em y = 1<br>• Resultado: Ponto (0, 2) e assíntota y = 1"
+    },
+    {
+        title: "24. Um prisma reto de base quadrada tem aresta a = 12 cm e altura h = 15 cm. Qual o seu volume?",
+        formula: "Volume do Prisma:<br>V = Área_base · h<br>Área_base = a²",
+        options: ["A) 180 cm³", "B) 1 440 cm³", "C) 1 800 cm³", "D) 2 160 cm³", "E) 2 880 cm³"],
+        answer: 3,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Área da Base): A = 12² = 144 cm²<br>• Passo 2 (Volume): V = 144 · 15<br>• Passo 3 (Cálculo): V = 2 160 cm³"
+    },
+    {
+        title: "25. Um paralelepípedo retângulo (caixa de sapato) possui quantas arestas?",
+        formula: "Contagem de Arestas:<br>• 4 arestas na base inferior<br>• 4 arestas na base superior<br>• 4 arestas verticais",
+        options: ["A) 6", "B) 8", "C) 12", "D) 16", "E) 20"],
+        answer: 2,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Base Inf.): 4 arestas<br>• Passo 2 (Base Sup.): 4 arestas<br>• Passo 3 (Verticais): 4 arestas<br>• Resultado: 4 + 4 + 4 = 12 arestas"
+    },
+    {
+        title: "26. A população de mosquitos é modelada por N(t) = 2^t + 5. Qual o total de mosquitos após t = 6 dias?",
+        formula: "Modelo Exponencial:<br>N(6) = 2⁶ + 5",
+        options: ["A) 37", "B) 69", "C) 128", "D) 133", "E) 64"],
+        answer: 1,
+        explanation: "Resolução Passo a Passo:<br>• Passo 1 (Potência): 2⁶ = 64<br>• Passo 2 (Soma): N(6) = 64 + 5<br>  N(6) = 69 mosquitos"
+    }
+];
+
+let currentIndex = 0;
+let userAnswers = [];
+let studentName = "";
+let studentClass = "";
+let showingFeedback = false;
+
+function startQuiz() {
+    studentName = document.getElementById('student-name').value.trim();
+    studentClass = document.getElementById('student-class').value;
+
+    if (!studentName || !studentClass) {
+        alert("Por favor, preencha seu nome e selecione sua turma antes de começar.");
+        return;
+    }
+
+    document.getElementById('screen-setup').classList.remove('active');
+    document.getElementById('screen-quiz').classList.add('active');
+    document.getElementById('student-info').textContent = `${studentName} (${studentClass})`;
+
+    renderQuestion();
+}
+
+function renderQuestion() {
+    showingFeedback = false;
+    const q = questions[currentIndex];
+
+    // Atualizar progresso
+    document.getElementById('q-counter').textContent = `Questão ${currentIndex + 1} de ${questions.length}`;
+    document.getElementById('progress-fill').style.width = `${((currentIndex + 1) / questions.length) * 100}%`;
+
+    document.getElementById('q-title').textContent = q.title;
+    document.getElementById('formula-text').innerHTML = q.formula;
+
+    // Renderizar opções
+    const optionsList = document.getElementById('options-list');
+    optionsList.innerHTML = '';
+
+    q.options.forEach((opt, idx) => {
+        const li = document.createElement('li');
+        li.className = 'option-item';
+        li.innerHTML = `
+            <label class="option-label">
+                <input type="radio" name="option" value="${idx}">
+                <span>${opt}</span>
+            </label>
+        `;
+        optionsList.appendChild(li);
+    });
+
+    // Resetar feedback box e botão
+    document.getElementById('feedback-box').className = 'feedback-box';
+    document.getElementById('btn-action').textContent = "Confirmar Resposta";
+}
+
+function handleAction() {
+    if (!showingFeedback) {
+        // Validar seleção
+        const selected = document.querySelector('input[name="option"]:checked');
+        if (!selected) {
+            alert("Por favor, selecione uma resposta!");
+            return;
+        }
+
+        const userChoice = parseInt(selected.value);
+        userAnswers[currentIndex] = userChoice;
+
+        const q = questions[currentIndex];
+        const feedbackBox = document.getElementById('feedback-box');
+        const isCorrect = userChoice === q.answer;
+
+        if (isCorrect) {
+            feedbackBox.className = 'feedback-box correct';
+            document.getElementById('feedback-title').textContent = "✓ Resposta Correta!";
+        } else {
+            feedbackBox.className = 'feedback-box wrong';
+            document.getElementById('feedback-title').textContent = `✕ Resposta Incorreta (Gabarito: ${q.options[q.answer].slice(0,2)})`;
+        }
+
+        document.getElementById('feedback-text').innerHTML = `<div class="resolution-vertical">${q.explanation}</div>`;
+        showingFeedback = true;
+
+        // Alterar botão para "Avançar"
+        if (currentIndex === questions.length - 1) {
+            document.getElementById('btn-action').textContent = "Ver Resultado Final";
+        } else {
+            document.getElementById('btn-action').textContent = "Avançar para a Próxima";
+        }
+    } else {
+        // Ir para a próxima questão ou resultado
+        currentIndex++;
+        if (currentIndex < questions.length) {
+            renderQuestion();
+        } else {
+            showResults();
+        }
+    }
+}
+
+function showResults() {
+    document.getElementById('screen-quiz').classList.remove('active');
+    document.getElementById('screen-result').classList.add('active');
+
+    let score = 0;
+    const summaryList = document.getElementById('summary-list');
+    summaryList.innerHTML = '';
+
+    questions.forEach((q, idx) => {
+        const isCorrect = userAnswers[idx] === q.answer;
+        if (isCorrect) score++;
+
+        const item = document.createElement('div');
+        item.className = 'summary-item';
+        item.innerHTML = `
+            <span>Questão ${idx + 1}</span>
+            <span class="${isCorrect ? 'status-ok' : 'status-err'}">
+                ${isCorrect ? 'Correta ✓' : 'Incorreta ✕'}
+            </span>
+        `;
+        summaryList.appendChild(item);
+    });
+
+    const percent = ((score / questions.length) * 100).toFixed(1);
+    document.getElementById('result-student').textContent = `Aluno: ${studentName} | Turma: ${studentClass}`;
+    document.getElementById('score-num').textContent = `${score} / ${questions.length}`;
+    document.getElementById('score-percent').textContent = `Aproveitamento: ${percent}%`;
+}
+
+function restartQuiz() {
+    currentIndex = 0;
+    userAnswers = [];
+    document.getElementById('screen-result').classList.remove('active');
+    document.getElementById('screen-setup').classList.add('active');
+    document.getElementById('student-name').value = '';
+    document.getElementById('student-class').value = '';
+}
+</script>
+</body>
+</html>
